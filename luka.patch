@@ -1,0 +1,323 @@
+diff --git a/Service/DBModel.Context.cs b/Service/DBModel.Context.cs
+index 078812a..68cb100 100644
+--- a/Service/DBModel.Context.cs
++++ b/Service/DBModel.Context.cs
+@@ -15,10 +15,7 @@ namespace Service
+     
+     public partial class VehiclesDBEntities : DbContext
+     {
+-        public VehiclesDBEntities()
+-            : base("VehiclesDB")
+-        {
+-        }
++        public VehiclesDBEntities(): base("VehiclesDB"){}
+     
+         protected override void OnModelCreating(DbModelBuilder modelBuilder)
+         {
+@@ -28,4 +25,4 @@ namespace Service
+         public virtual DbSet<Make> Make { get; set; }
+         public virtual DbSet<Model> Model { get; set; }
+     }
+-}
++}
+\ No newline at end of file
+diff --git a/Service/IVehicleService.cs b/Service/IVehicleService.cs
+index bfeb8b5..ae89b43 100644
+--- a/Service/IVehicleService.cs
++++ b/Service/IVehicleService.cs
+@@ -12,29 +12,18 @@ namespace Service
+     {
+         // Make
+         Task<IVehicleMake> GetVehicleMakeAsync(Guid id);
+-
+         Task<List<IVehicleMake>> GetAllVehicleMakeAsync(string search);
+-
+         Task<IVehicleMake> AddVehicleMakeAsync(IVehicleMake vehicleMake);
+-
+         Task<bool> UpdateVehicleMakeAsync(IVehicleMake vehicleMakeUpdate);
+-
+         Task<bool> DeleteVehicleMakeAsync(Guid id);
+-
+-       // Task<IVehicleMake> GetVehicleMakeAbrv(string abrv);
++        //Task<IVehicleMake> GetVehicleMakeAbrv(string abrv);
+         
+         // Model
+         Task<IVehicleModel> GetVehicleModelAsync(Guid id);
+-      
+         Task<List<IVehicleModel>> GetAllVehicleModelAsync(string search);
+-
+         Task<IVehicleModel> AddVehicleModelAsync(IVehicleModel vehicleModel);
+-
+         Task<bool> UpdateVehicleModelAsync(IVehicleModel vehicleModelUpdate);
+-
+         Task<bool> DeleteVehicleModelAsync(Guid id);
+         Task<List<IVehicleModel>> GetAllModelsForOneMake(Guid Id);
+-
+-
+     }
+ }
+diff --git a/Service/Model.cs b/Service/Model.cs
+index f958714..ae21db0 100644
+--- a/Service/Model.cs
++++ b/Service/Model.cs
+@@ -18,7 +18,6 @@ namespace Service
+         public Nullable<System.Guid> MakeId { get; set; }
+         public string Name { get; set; }
+         public string Abrv { get; set; }
+-    
+         public virtual Make Make { get; set; }
+     }
+ }
+diff --git a/Service/Models/IVehicleMake.cs b/Service/Models/IVehicleMake.cs
+index 806e588..a7ac848 100644
+--- a/Service/Models/IVehicleMake.cs
++++ b/Service/Models/IVehicleMake.cs
+@@ -10,14 +10,8 @@ namespace Service.Models
+        public interface IVehicleMake
+         {
+             Guid Id { get; set; }
+-
+             string Name { get; set; }
+-
+             string Abrv { get; set; }
+-
+             List<IVehicleModel> VehicleModels { get; set; }
+-           
+-            
+-     
+     }
+ }
+diff --git a/Service/Models/IVehicleModel.cs b/Service/Models/IVehicleModel.cs
+index 1ef190d..d2ac81d 100644
+--- a/Service/Models/IVehicleModel.cs
++++ b/Service/Models/IVehicleModel.cs
+@@ -9,13 +9,9 @@ namespace Service.Models
+         public interface IVehicleModel
+         {
+             Guid Id { get; set; }
+-
+             Guid MakeId { get; set; }
+-
+             string Name { get; set; }
+-
+             string Abrv { get; set; }
+-
+             IVehicleMake VehicleMake { get; set; }
+         }
+     }
+diff --git a/Service/Models/VehicleMake.cs b/Service/Models/VehicleMake.cs
+index 551e24d..eeac108 100644
+--- a/Service/Models/VehicleMake.cs
++++ b/Service/Models/VehicleMake.cs
+@@ -7,17 +7,12 @@ using X.PagedList;
+ 
+ namespace Service.Models
+ {
+-    
+         public class VehicleMake : IVehicleMake
+         {
+             public Guid Id { get; set; }
+-
+             public string Name { get; set; }
+-
+             public string Abrv { get; set; }
+-
+             public List<IVehicleModel> VehicleModels { get; set; }
+-
+         }
+     }
+ 
+diff --git a/Service/Models/VehicleModel.cs b/Service/Models/VehicleModel.cs
+index 30e065a..521bfc2 100644
+--- a/Service/Models/VehicleModel.cs
++++ b/Service/Models/VehicleModel.cs
+@@ -9,14 +9,9 @@ namespace Service.Models
+     public class VehicleModel : IVehicleModel
+     {
+         public Guid Id { get; set; }
+-
+         public Guid MakeId { get; set; }
+-
+         public string Name { get; set; }
+-
+         public string Abrv { get; set; }
+-
+         public IVehicleMake VehicleMake { get; set; }
+-
+     }
+ }
+diff --git a/Service/ServiceProfile.cs b/Service/ServiceProfile.cs
+index 4f7b845..efd6d98 100644
+--- a/Service/ServiceProfile.cs
++++ b/Service/ServiceProfile.cs
+@@ -16,7 +16,5 @@ namespace Service
+             CreateMap<Make, IVehicleMake>().ReverseMap();
+             CreateMap<Model, IVehicleModel>().ReverseMap();
+         }
+-
+-
+     }
+ }
+diff --git a/Service/VehicleService.cs b/Service/VehicleService.cs
+index f05fb97..136311a 100644
+--- a/Service/VehicleService.cs
++++ b/Service/VehicleService.cs
+@@ -14,30 +14,23 @@ namespace Service
+ {
+     public class VehicleService : IVehicleService
+     {
++        protected VehiclesDBEntities Context{get; set;}
+         private readonly IMapper _mapper;
+         private readonly VehiclesDBEntities _Context;
+ 
+-
+-
+         public VehicleService(VehiclesDBEntities context, IMapper mapper)
+         {
+             _Context = context;
+             _mapper = mapper;
+         }
+ 
+-        protected VehiclesDBEntities Context{get; set;}
+-
+-       
+         public async Task<IVehicleMake> AddVehicleMakeAsync(IVehicleMake vehicleMake)
+         {           
+-            
+             vehicleMake.Id = Guid.NewGuid();
+             _Context.Make.Add(_mapper.Map<IVehicleMake, Make>(vehicleMake));
+             await _Context.SaveChangesAsync();
+                
+             return vehicleMake;
+-            
+-
+         }
+ 
+         public async Task<bool> DeleteVehicleMakeAsync(Guid id)
+@@ -56,7 +49,6 @@ namespace Service
+             var allVehicleMakes = await _Context.Make.OrderBy(x => x.Name).Where(x => x.Name.StartsWith(search) || search == null).ToListAsync();
+             return _mapper.Map<List<IVehicleMake>>(allVehicleMakes);
+         }
+-
+      
+         public async Task<IVehicleMake> GetVehicleMakeAsync(Guid id)
+         {
+@@ -67,12 +59,10 @@ namespace Service
+         public async Task<bool> UpdateVehicleMakeAsync(IVehicleMake vehicleMakeUpdate)
+         {
+             Guid id = vehicleMakeUpdate.Id;
+-
+             var entity = await _Context.Make.SingleOrDefaultAsync(item => item.Id == id);
+ 
+             if (entity != null)
+             {
+-
+                 entity.Name = vehicleMakeUpdate.Name;
+                 entity.Abrv = vehicleMakeUpdate.Abrv;
+ 
+@@ -80,20 +70,16 @@ namespace Service
+                 _Context.SaveChanges();
+             }
+             return true;
+-
+         }
+-     
+-        //////////////////////////////////////////  Model //////////////////////////////////////////////////////////////
+ 
++        //////////////////////////////////////////  Model //////////////////////////////////////////////////////////////
+         public async Task<IVehicleModel> AddVehicleModelAsync(IVehicleModel vehicleModel)
+         {
+-         
+             vehicleModel.Id = Guid.NewGuid();
+ 
+             _Context.Model.Add(_mapper.Map<IVehicleModel, Model>(vehicleModel));
+             await _Context.SaveChangesAsync();
+             return vehicleModel;
+-
+         }
+ 
+         public async Task<bool> DeleteVehicleModelAsync(Guid id)
+@@ -115,7 +101,6 @@ namespace Service
+             
+         public async Task<IVehicleModel> GetVehicleModelAsync(Guid id)
+         {
+-         
+            var getVehicleModel = await _Context.Model.SingleOrDefaultAsync(x => x.MakeId == id);
+            return _mapper.Map<IVehicleModel>(getVehicleModel);
+         }
+@@ -123,28 +108,24 @@ namespace Service
+         public async Task<bool> UpdateVehicleModelAsync(IVehicleModel vehicleModelUpdate)
+         {
+             Guid id = vehicleModelUpdate.Id;
+-
+             var entity = await _Context.Model.SingleOrDefaultAsync(item => item.Id == id);
+ 
+             if (entity != null)
+             {
+-
+                 entity.Name = vehicleModelUpdate.Name;
+                 entity.Abrv = vehicleModelUpdate.Abrv;
+               
+                 _Context.SaveChanges();
+             }
+             return true;
+-
+         }
+         // Get all models for one make by Id
+         public async Task<List<IVehicleModel>> GetAllModelsForOneMake(Guid Id)
+         {                   
+             var allVehicleModel = await _Context.Model.OrderBy(x => x.Name).Where(x=> x.MakeId==Id).ToListAsync();
+             return _mapper.Map<List<IVehicleModel>>(allVehicleModel);
+-            }
+         }
+-        
+-    }
++    }        
++}
+ 
+ 
+diff --git a/VehicleApp/Global.asax.cs b/VehicleApp/Global.asax.cs
+index cc93466..f6a6613 100644
+--- a/VehicleApp/Global.asax.cs
++++ b/VehicleApp/Global.asax.cs
+@@ -24,18 +24,12 @@ namespace VehicleApp
+         public IConfiguration Configuration { get; }
+         protected void Application_Start()
+         {
+-
+             AreaRegistration.RegisterAllAreas();
+             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);
+             RouteConfig.RegisterRoutes(RouteTable.Routes);
+             BundleConfig.RegisterBundles(BundleTable.Bundles);
+             AutofacConfig.ConfigureDependencyInjection();
+-          
+-
+-
+-
+-          
+-
++        
+             /* var builder = new ContainerBuilder();
+              builder.RegisterControllers(typeof(MvcApplication).Assembly);
+              ModuleService.ConfigureServiceModule(builder);
+@@ -46,6 +40,4 @@ namespace VehicleApp
+              */
+         }
+     }
+-
+-   
+-    }
++}
+diff --git a/VehicleApp/Models/VehicleMakeView.cs b/VehicleApp/Models/VehicleMakeView.cs
+index f7b0403..e67f1c2 100644
+--- a/VehicleApp/Models/VehicleMakeView.cs
++++ b/VehicleApp/Models/VehicleMakeView.cs
+@@ -17,7 +17,5 @@ namespace VehicleApp.Models
+         public string Name { get; set; }
+         public string Abrv { get; set; }
+         public List<VehicleMakeView> VehicleModels { get; set; }
+-
+     }
+-
+ }
+\ No newline at end of file

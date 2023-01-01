@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema Namespace="VehiclesDBModel" Alias="Self" annotation:UseStrongSpatialTypes="false" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" xmlns:customannotation="http://schemas.microsoft.com/ado/2013/11/edm/customannotation" xmlns="http://schemas.microsoft.com/ado/2009/11/edm">
+  <EntityType Name="Make">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="Guid" Nullable="false" />
+    <Property Name="Name" Type="String" MaxLength="20" FixedLength="true" Unicode="true" />
+    <Property Name="Abrv" Type="String" MaxLength="20" FixedLength="true" Unicode="true" />
+    <NavigationProperty Name="Model" Relationship="Self.FK__Model__MakeId__0E6E26BF" FromRole="Make" ToRole="Model" />
+  </EntityType>
+  <EntityType Name="Model">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Name="Id" Type="Guid" Nullable="false" />
+    <Property Name="MakeId" Type="Guid" />
+    <Property Name="Name" Type="String" MaxLength="20" FixedLength="true" Unicode="true" />
+    <Property Name="Abrv" Type="String" MaxLength="10" FixedLength="true" Unicode="true" />
+    <NavigationProperty Name="Make" Relationship="Self.FK__Model__MakeId__0E6E26BF" FromRole="Model" ToRole="Make" />
+  </EntityType>
+  <Association Name="FK__Model__MakeId__0E6E26BF">
+    <End Role="Make" Type="Self.Make" Multiplicity="0..1" />
+    <End Role="Model" Type="Self.Model" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Make">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Model">
+        <PropertyRef Name="MakeId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <EntityContainer Name="VehiclesDBEntities" annotation:LazyLoadingEnabled="true">
+    <EntitySet Name="Make" EntityType="Self.Make" />
+    <EntitySet Name="Model" EntityType="Self.Model" />
+    <AssociationSet Name="FK__Model__MakeId__0E6E26BF" Association="Self.FK__Model__MakeId__0E6E26BF">
+      <End Role="Make" EntitySet="Make" />
+      <End Role="Model" EntitySet="Model" />
+    </AssociationSet>
+  </EntityContainer>
+</Schema>
